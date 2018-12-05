@@ -1,8 +1,7 @@
 // credits: https://medium.com/@bantic/hand-coding-a-color-wheel-with-canvas-78256c9d7d43
 export function drawCircle(canvas) {
   const ctx = canvas.getContext('2d');
-
-  const radius = 300;
+  const radius = canvas.width / 2;
   const image = ctx.createImageData(2 * radius, 2 * radius);
   const  { data } = image;
 

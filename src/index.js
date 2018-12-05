@@ -8,26 +8,31 @@ const client = mqtt.connect('ws://iot.eclipse.org/ws');
 // client.on('connect', () => {
 // })
 
-let toRef;
+let timeoutRef;
 let rgb;
 
 function handleColorSelect(r, g, b) {
   rgb = [r, g, b];
-  if (toRef) {
+  if (timeoutRef) {
     return;
   }
 
   send(r, g, b);
 
-  toRef = setTimeout(() => {
-    toRef = undefined;
-    const [r, g, b] = rgb;
-    send(r, g, b);
+  timeoutRef = setTimeout(() => {
+    timeoutRef = undefined;
+    const [r1, g1, b1] = rgb;
+    if (r !== r1 || g !== g1 || b !== b1) {
+      send(r1, g1, b1);
+    }
   }, 200);
 }
 
 function send(r, g, b) {
-  client.publish('sk.eastcode.demo/rgb', JSON.stringify({ r, g, b }));
+  client.publish('esp8266_48C9DC/rpc', JSON.stringify({
+    method: 'setRGB',
+    params: { r, g, b },
+  }));
 }
 
 ReactDOM.render(
