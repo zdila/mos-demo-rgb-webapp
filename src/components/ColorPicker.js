@@ -6,9 +6,11 @@ export default function ColorPicker({ onColorSelect }) {
 
   useEffect(() => {
     const resizeCanvas = () => {
-      canvasEl.current.width = window.innerWidth;
-      canvasEl.current.height = window.innerWidth;
-      drawCircle(canvasEl.current);
+      const canvas = canvasEl.current;
+      const w = canvas.parentNode.clientWidth;
+      canvas.width = w;
+      canvas.height = w;
+      drawCircle(canvas);
     };
 
     resizeCanvas();
