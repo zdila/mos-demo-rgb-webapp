@@ -41,8 +41,6 @@ function send(r, g, b) {
 }
 
 ReactDOM.render(
-  <div>
-    <ColorPicker onChange={handleColorSelect} />
-  </div>,
+  <ColorPicker onChange={handleColorSelect} />,
   document.getElementById('main'),
 );
