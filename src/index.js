@@ -11,7 +11,7 @@ const client = mqtt.connect('ws://iot.eclipse.org/ws');
 let timeoutRef;
 let rgb;
 
-function handleColorSelect(r, g, b) {
+function handleColorSelect([r, g, b]) {
   rgb = [r, g, b];
   if (timeoutRef) {
     return;
@@ -31,11 +31,13 @@ function handleColorSelect(r, g, b) {
 function send(r, g, b) {
   client.publish('esp8266_48C9DC/rpc', JSON.stringify({
     method: 'setRGB',
-    params: { r, g, b },
+    params: { r: r / 255, g: g / 255, b: b / 255 },
   }));
 }
 
 ReactDOM.render(
-  <ColorPicker onColorSelect={handleColorSelect} />,
+  <div>
+    <ColorPicker onChange={handleColorSelect} />
+  </div>,
   document.getElementById('main'),
 );

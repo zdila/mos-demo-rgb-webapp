@@ -1,61 +1,29 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { drawCircle } from './colorWheel';
+import React, { useState } from 'react';
+import HuePicker from './HuePicker';
+import BrightnessPicker from './BrightnessPicker';
 
-export default function ColorPicker({ onColorSelect }) {
-  const canvasEl = useRef(null);
+export default function ColorPicker({ onChange }) {
+  const [hue, setHue] = useState([255, 255, 255]);
+  const [brightness, setBrightness] = useState(1);
 
-  useEffect(() => {
-    const resizeCanvas = () => {
-      const canvas = canvasEl.current;
-      const w = canvas.parentNode.clientWidth;
-      canvas.width = w;
-      canvas.height = w;
-      drawCircle(canvas);
-    };
-
-    resizeCanvas();
-
-    window.addEventListener('resize', resizeCanvas);
-    return () => {
-      window.removeEventListener('resize', resizeCanvas);
-    };
-  }, []);
-
-  const [dragging, setDragging] = useState(false);
-
-  function handleChange(e) {
-    if (!onColorSelect) {
-      return;
-    }
-    const c = canvasEl.current;
-    const { x, y } = c.getBoundingClientRect();
-    const ctx = c.getContext('2d');
-    const [r, g, b, a] = ctx.getImageData(e.clientX - x, e.clientY - y, 1, 1).data;
-    if (a === 255) {
-      onColorSelect(r, g, b);
-    }
+  function sendEvent(rgb, v) {
+    onChange(rgb.map(x => x * v));
   }
 
-  function handlePointerDown(e) {
-    handleChange(e);
-    setDragging(true);
+  function handleHueChange(rgb) {
+    setHue(rgb);
+    sendEvent(rgb, brightness);
   }
 
-  function handlePointerMove(e) {
-    if (onColorSelect && dragging) {
-      handleChange(e);
-    }
+  function handleBrightnessChange(v) {
+    setBrightness(v);
+    sendEvent(hue, v);
   }
 
   return (
-    <canvas
-      ref={canvasEl}
-      width="10"
-      height="10"
-      onPointerDown={handlePointerDown}
-      onPointerUp={() => setDragging(false)}
-      onPointerLeave={() => setDragging(false)}
-      onPointerMove={handlePointerMove}
-    />
+    <div>
+      <HuePicker onChange={handleHueChange} brightness={brightness} />
+      <BrightnessPicker onChange={handleBrightnessChange} color={`rgb(${hue[0]}, ${hue[1]}, ${hue[2]})`} />
+    </div>
   );
 }
