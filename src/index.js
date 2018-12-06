@@ -5,8 +5,13 @@ import ColorPicker from './components/ColorPicker';
 
 const client = mqtt.connect('ws://iot.eclipse.org/ws');
 
-// client.on('connect', () => {
-// })
+client.on('connect', () => {
+  console.log('Connected.');
+})
+
+client.on('error', (err) => {
+  console.error('Connecttion error:', err);
+})
 
 let timeoutRef;
 let rgb;
