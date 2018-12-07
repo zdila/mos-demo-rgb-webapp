@@ -24,7 +24,7 @@ export default function BrightnessPicker({ onChange, color }) {
     <div
       ref={divEl}
       style={{
-        height: '40px',
+        height: '80pt',
         backgroundImage: `linear-gradient(to right, black, ${color})`,
       }}
       onPointerDown={handlePointerDown}
