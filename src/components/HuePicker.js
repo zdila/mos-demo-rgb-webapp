@@ -23,7 +23,7 @@ export default function HuePicker({ onChange, brightness }) {
 
   const [dragging, setDragging] = useState(false);
 
-  function handleChange(e) {
+  function sendEvent(e) {
     if (!onChange) {
       return;
     }
@@ -37,13 +37,13 @@ export default function HuePicker({ onChange, brightness }) {
   }
 
   function handlePointerDown(e) {
-    handleChange(e);
+    sendEvent(e);
     setDragging(true);
   }
 
   function handlePointerMove(e) {
     if (onChange && dragging) {
-      handleChange(e);
+      sendEvent(e);
     }
   }
 
