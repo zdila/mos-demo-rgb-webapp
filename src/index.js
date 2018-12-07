@@ -10,7 +10,7 @@ client.on('connect', () => {
 })
 
 client.on('error', (err) => {
-  console.error('Connecttion error:', err);
+  console.error('Connection error:', err);
 })
 
 let timeoutRef;
