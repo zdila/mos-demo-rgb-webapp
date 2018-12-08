@@ -52,7 +52,10 @@ export default function HuePicker({ onChange, brightness }) {
       ref={canvasEl}
       width="10"
       height="10"
-      style={{ filter: `brightness(${brightness * 100}%)` }}
+      style={{
+        filter: `brightness(${brightness * 100}%)`,
+        touchAction: 'none',
+      }}
       onPointerDown={handlePointerDown}
       onPointerUp={() => setDragging(false)}
       onPointerLeave={() => setDragging(false)}

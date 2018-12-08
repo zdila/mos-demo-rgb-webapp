@@ -16,10 +16,10 @@ client.on('error', (err) => {
 let timeoutRef;
 let rgb;
 
-function handleColorSelect([r, g, b]) {
+function handleColorChange([r, g, b]) {
   rgb = [r, g, b];
   if (timeoutRef) {
-    return;
+    return; // throttling
   }
 
   send(r, g, b);
@@ -41,6 +41,6 @@ function send(r, g, b) {
 }
 
 ReactDOM.render(
-  <ColorPicker onChange={handleColorSelect} />,
+  <ColorPicker onChange={handleColorChange} />,
   document.getElementById('main'),
 );

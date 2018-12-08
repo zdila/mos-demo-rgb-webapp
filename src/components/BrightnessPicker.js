@@ -10,12 +10,12 @@ export default function BrightnessPicker({ onChange, color }) {
   }
 
   function handlePointerDown(e) {
-    sendEvent(e);
     setDragging(true);
+    sendEvent(e);
   }
 
   function handlePointerMove(e) {
-    if (onChange && dragging) {
+    if (dragging) {
       sendEvent(e);
     }
   }
@@ -24,8 +24,9 @@ export default function BrightnessPicker({ onChange, color }) {
     <div
       ref={divEl}
       style={{
-        height: '80pt',
+        height: '40pt',
         backgroundImage: `linear-gradient(to right, black, ${color})`,
+        touchAction: 'none',
       }}
       onPointerDown={handlePointerDown}
       onPointerUp={() => setDragging(false)}
