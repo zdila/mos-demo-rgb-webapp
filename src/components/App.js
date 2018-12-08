@@ -20,16 +20,16 @@ export default function App() {
 
   useEffect(() => {
     if (throttledColor) {
-      send(...throttledColor);
+      clientRef.current.publish('esp8266_48C9DC/rpc', JSON.stringify({
+        method: 'setRGB',
+        params: {
+          r: throttledColor[0] / 255,
+          g: throttledColor[1] / 255,
+          b: throttledColor[2] / 255,
+        },
+      }));
     }
   }, [throttledColor]);
-
-  function send(r, g, b) {
-    clientRef.current.publish('esp8266_48C9DC/rpc', JSON.stringify({
-      method: 'setRGB',
-      params: { r: r / 255, g: g / 255, b: b / 255 },
-    }));
-  }
 
   return (
     <ColorPicker onChange={setColor} />
