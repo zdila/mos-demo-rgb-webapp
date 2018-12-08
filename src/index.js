@@ -1,46 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import mqtt from 'mqtt';
-import ColorPicker from './components/ColorPicker';
-
-const client = mqtt.connect('ws://iot.eclipse.org/ws');
-
-client.on('connect', () => {
-  console.log('Connected.');
-})
-
-client.on('error', (err) => {
-  console.error('Connection error:', err);
-})
-
-let timeoutRef;
-let rgb;
-
-function handleColorChange([r, g, b]) {
-  rgb = [r, g, b];
-  if (timeoutRef) {
-    return; // throttling
-  }
-
-  send(r, g, b);
-
-  timeoutRef = setTimeout(() => {
-    timeoutRef = undefined;
-    const [r1, g1, b1] = rgb;
-    if (r !== r1 || g !== g1 || b !== b1) {
-      send(r1, g1, b1);
-    }
-  }, 200);
-}
-
-function send(r, g, b) {
-  client.publish('esp8266_48C9DC/rpc', JSON.stringify({
-    method: 'setRGB',
-    params: { r: r / 255, g: g / 255, b: b / 255 },
-  }));
-}
+import App from './components/App';
 
 ReactDOM.render(
-  <ColorPicker onChange={handleColorChange} />,
+  <App />,
   document.getElementById('main'),
 );

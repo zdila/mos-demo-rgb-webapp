@@ -24,6 +24,7 @@
   "dependencies": {
     "mqtt": "^2.18.8",
     "react": "^16.7.0-alpha.2",
-    "react-dom": "^16.7.0-alpha.2"
+    "react-dom": "^16.7.0-alpha.2",
+    "use-throttle": "0.0.3"
   }
 }
