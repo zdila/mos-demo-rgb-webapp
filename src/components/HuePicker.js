@@ -47,6 +47,7 @@ export default function HuePicker({ onChange, brightness }) {
     }
   }
 
+  // TODO use webgl: https://github.com/gre/gl-react-dom-v2/, https://thebookofshaders.com/06/
   return (
     <canvas
       ref={canvasEl}

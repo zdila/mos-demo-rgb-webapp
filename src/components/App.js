@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useThrottle } from 'use-throttle';
 import mqtt from 'mqtt';
 import ColorPicker from './ColorPicker';
-import { useThrottle } from 'use-throttle';
 
 export default function App() {
   const clientRef = useRef();
@@ -9,6 +9,8 @@ export default function App() {
 
   useEffect(() => {
     const client = mqtt.connect('ws://iot.eclipse.org/ws');
+    // attachMqttEvents(client);
+
     clientRef.current = client;
     return () => {
       client.end();
@@ -38,7 +40,7 @@ export default function App() {
 
 
 
-// function attachMqttEvents() {
+// function attachMqttEvents(conn) {
 //   conn.on('connect', () => {
 //     window.alert('Connected.');
 //   })
