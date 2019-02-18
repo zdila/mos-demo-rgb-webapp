@@ -27,12 +27,22 @@ export default function HuePicker({ onChange, brightness }) {
     if (!onChange) {
       return;
     }
-    const c = canvasEl.current;
-    const { x, y } = c.getBoundingClientRect();
-    const ctx = c.getContext('2d');
-    const [r, g, b, a] = ctx.getImageData(e.clientX - x, e.clientY - y, 1, 1).data;
-    if (a === 255) {
-      onChange([r, g, b]);
+    const canvas = canvasEl.current;
+    const { x, y, width, height } = canvas.getBoundingClientRect();
+    const px = ((e.clientX - x) - width / 2) / (width / 2);
+    const py = ((e.clientY - y) - height / 2) / (height / 2);
+    let h = Math.atan(py / px) - Math.PI;
+    if (px < 0) {
+      h -= Math.PI;
+    }
+    while (h < 0) {
+      h += 2 * Math.PI;
+    }
+
+    const s = Math.sqrt(px * px + py * py);
+
+    if (s <= 1) {
+      onChange({ h, s });
     }
   }
 

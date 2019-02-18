@@ -3,27 +3,24 @@ import HuePicker from './HuePicker';
 import BrightnessPicker from './BrightnessPicker';
 
 export default function ColorPicker({ onChange }) {
-  const [hue, setHue] = useState([255, 255, 255]);
+  const [hs, setHs] = useState({ h: 0, s: 0 });
   const [brightness, setBrightness] = useState(1);
 
-  function sendEvent(rgb, v) {
-    onChange(rgb.map(x => x * v));
-  }
 
-  function handleHueChange(rgb) {
-    setHue(rgb);
-    sendEvent(rgb, brightness);
+  function handleHsChange(newHs) {
+    setHs(newHs);
+    onChange({ ...newHs, v: brightness });
   }
 
   function handleBrightnessChange(v) {
     setBrightness(v);
-    sendEvent(hue, v);
+    onChange({ ...hs, v });
   }
 
   return (
     <div>
-      <HuePicker onChange={handleHueChange} brightness={brightness} />
-      <BrightnessPicker onChange={handleBrightnessChange} color={`rgb(${hue[0]}, ${hue[1]}, ${hue[2]})`} />
+      <HuePicker onChange={handleHsChange} brightness={brightness} />
+      <BrightnessPicker onChange={handleBrightnessChange} color={`hsl(${Math.round(hs.h / Math.PI * 180)}, ${Math.round(hs.s * 100)}%, 50%)`} />
     </div>
   );
 }
