@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useThrottle } from 'use-throttle';
 import mqtt from 'mqtt';
-import ColorPicker from './ColorPicker';
+import { ColorPicker } from './ColorPicker';
 
-export default function App() {
+export function App() {
   const clientRef = useRef();
 
   const [color, setColor] = useState(undefined);

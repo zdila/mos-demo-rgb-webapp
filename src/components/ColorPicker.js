@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import HuePicker from './HuePicker';
-import BrightnessPicker from './BrightnessPicker';
+import { HuePicker } from './HuePicker';
+import { BrightnessPicker } from './BrightnessPicker';
 
-export default function ColorPicker({ onChange }) {
+export function ColorPicker({ onChange }) {
   const [hue, setHue] = useState([255, 255, 255]);
 
   const [brightness, setBrightness] = useState(1);

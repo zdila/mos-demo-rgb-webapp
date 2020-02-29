@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 
-export default function BrightnessPicker({ onChange, color }) {
+export function BrightnessPicker({ onChange, color }) {
   const divEl = useRef(null);
 
   const [dragging, setDragging] = useState(false);

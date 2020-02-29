@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { drawCircle } from './colorWheel';
 
-export default function HuePicker({ onChange, brightness }) {
+export function HuePicker({ onChange, brightness }) {
   const canvasEl = useRef(null);
 
   useEffect(() => {
