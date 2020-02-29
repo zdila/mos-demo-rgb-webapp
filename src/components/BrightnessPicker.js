@@ -2,10 +2,12 @@ import React, { useRef, useState } from 'react';
 
 export default function BrightnessPicker({ onChange, color }) {
   const divEl = useRef(null);
+
   const [dragging, setDragging] = useState(false);
 
   function sendEvent(e) {
     const { x, width } = divEl.current.getBoundingClientRect();
+
     onChange((e.clientX - x) / width);
   }
 

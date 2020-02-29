@@ -7,15 +7,19 @@ export default function HuePicker({ onChange, brightness }) {
   useEffect(() => {
     const resizeCanvas = () => {
       const canvas = canvasEl.current;
+
       const w = canvas.parentNode.clientWidth;
+
       canvas.width = w;
       canvas.height = w;
+
       drawCircle(canvas);
     };
 
     resizeCanvas();
 
     window.addEventListener('resize', resizeCanvas);
+
     return () => {
       window.removeEventListener('resize', resizeCanvas);
     };
@@ -27,10 +31,20 @@ export default function HuePicker({ onChange, brightness }) {
     if (!onChange) {
       return;
     }
+
     const c = canvasEl.current;
+
     const { x, y } = c.getBoundingClientRect();
+
     const ctx = c.getContext('2d');
-    const [r, g, b, a] = ctx.getImageData(e.clientX - x, e.clientY - y, 1, 1).data;
+
+    const [r, g, b, a] = ctx.getImageData(
+      e.clientX - x,
+      e.clientY - y,
+      1,
+      1,
+    ).data;
+
     if (a === 255) {
       onChange([r, g, b]);
     }
@@ -38,6 +52,7 @@ export default function HuePicker({ onChange, brightness }) {
 
   function handlePointerDown(e) {
     sendEvent(e);
+
     setDragging(true);
   }
 

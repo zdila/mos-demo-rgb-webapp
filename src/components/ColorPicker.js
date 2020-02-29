@@ -4,6 +4,7 @@ import BrightnessPicker from './BrightnessPicker';
 
 export default function ColorPicker({ onChange }) {
   const [hue, setHue] = useState([255, 255, 255]);
+
   const [brightness, setBrightness] = useState(1);
 
   function sendEvent(rgb, v) {
@@ -23,7 +24,10 @@ export default function ColorPicker({ onChange }) {
   return (
     <div>
       <HuePicker onChange={handleHueChange} brightness={brightness} />
-      <BrightnessPicker onChange={handleBrightnessChange} color={`rgb(${hue[0]}, ${hue[1]}, ${hue[2]})`} />
+      <BrightnessPicker
+        onChange={handleBrightnessChange}
+        color={`rgb(${hue[0]}, ${hue[1]}, ${hue[2]})`}
+      />
     </div>
   );
 }
