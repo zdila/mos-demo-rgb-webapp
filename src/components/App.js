@@ -68,8 +68,28 @@ export function App() {
 
   return (
     <>
-      <div>{connState}</div>
-      <ColorPicker onChange={setColor} />
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          margin: '4pt',
+          zIndex: 100,
+        }}
+      >
+        {connState}
+      </div>
+      <div
+        style={{
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-around',
+          alignItems: 'center',
+        }}
+      >
+        <ColorPicker onChange={setColor} />
+      </div>
     </>
   );
 }

@@ -26,9 +26,12 @@ export function BrightnessPicker({ onChange, color }) {
     <div
       ref={divEl}
       style={{
-        height: '40pt',
+        flexGrow: 1,
+        minHeight: '40pt',
+        alignSelf: 'stretch',
         backgroundImage: `linear-gradient(to right, black, ${color})`,
         touchAction: 'none',
+        margin: '4pt',
       }}
       onPointerDown={handlePointerDown}
       onPointerUp={() => setDragging(false)}

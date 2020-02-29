@@ -22,12 +22,12 @@ export function ColorPicker({ onChange }) {
   }
 
   return (
-    <div>
+    <>
       <HuePicker onChange={handleHueChange} brightness={brightness} />
       <BrightnessPicker
         onChange={handleBrightnessChange}
         color={`rgb(${hue[0]}, ${hue[1]}, ${hue[2]})`}
       />
-    </div>
+    </>
   );
 }

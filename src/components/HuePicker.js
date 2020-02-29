@@ -9,9 +9,12 @@ export function HuePicker({ onChange, brightness }) {
       const canvas = canvasEl.current;
 
       const w = canvas.parentNode.clientWidth;
+      const h = canvas.parentNode.clientHeight;
 
-      canvas.width = w;
-      canvas.height = w;
+      const size = Math.min(w, h);
+
+      canvas.width = size;
+      canvas.height = size;
 
       drawCircle(canvas);
     };
@@ -64,18 +67,29 @@ export function HuePicker({ onChange, brightness }) {
 
   // TODO use webgl: https://github.com/gre/gl-react-dom-v2/, https://thebookofshaders.com/06/
   return (
-    <canvas
-      ref={canvasEl}
-      width="10"
-      height="10"
+    <div
       style={{
-        filter: `brightness(${brightness * 100}%)`,
-        touchAction: 'none',
+        flexGrow: 4,
+        alignSelf: 'stretch',
+        margin: '4pt',
+        position: 'relative',
       }}
-      onPointerDown={handlePointerDown}
-      onPointerUp={() => setDragging(false)}
-      onPointerLeave={() => setDragging(false)}
-      onPointerMove={handlePointerMove}
-    />
+    >
+      <canvas
+        ref={canvasEl}
+        style={{
+          filter: `brightness(${brightness * 100}%)`,
+          touchAction: 'none',
+          position: 'absolute',
+          transform: 'translate(-50%, -50%)',
+          top: '50%',
+          left: '50%',
+        }}
+        onPointerDown={handlePointerDown}
+        onPointerUp={() => setDragging(false)}
+        onPointerLeave={() => setDragging(false)}
+        onPointerMove={handlePointerMove}
+      />
+    </div>
   );
 }
