@@ -1,10 +1,9 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useCallback, useMemo } from 'react';
 
-const brightnessPickerStyle = {
+const baseBrightnessPickerStyle = {
   flexGrow: 1,
   minHeight: '40pt',
   alignSelf: 'stretch',
-  backgroundImage: `linear-gradient(to right, black, ${color})`,
   touchAction: 'none',
   margin: '4pt',
 };
@@ -14,22 +13,39 @@ export function BrightnessPicker({ onChange, color }) {
 
   const [dragging, setDragging] = useState(false);
 
-  function sendEvent(e) {
-    const { x, width } = divEl.current.getBoundingClientRect();
+  const sendEvent = useCallback(
+    e => {
+      const { x, width } = divEl.current.getBoundingClientRect();
 
-    onChange((e.clientX - x) / width);
-  }
+      onChange((e.clientX - x) / width);
+    },
+    [onChange],
+  );
 
-  function handlePointerDown(e) {
-    setDragging(true);
-    sendEvent(e);
-  }
-
-  function handlePointerMove(e) {
-    if (dragging) {
+  const handlePointerDown = useCallback(
+    e => {
+      setDragging(true);
       sendEvent(e);
-    }
-  }
+    },
+    [sendEvent],
+  );
+
+  const handlePointerMove = useCallback(
+    e => {
+      if (dragging) {
+        sendEvent(e);
+      }
+    },
+    [sendEvent],
+  );
+
+  const brightnessPickerStyle = useMemo(
+    () => ({
+      ...baseBrightnessPickerStyle,
+      backgroundImage: `linear-gradient(to right, black, ${color})`,
+    }),
+    [color],
+  );
 
   return (
     <div

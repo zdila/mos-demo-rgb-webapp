@@ -1,4 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useMemo,
+  useCallback,
+} from 'react';
 import { drawCircle } from './colorWheel';
 
 const containerStyle = {
@@ -8,8 +14,7 @@ const containerStyle = {
   position: 'relative',
 };
 
-const canvasStyle = {
-  filter: `brightness(${brightness * 100}%)`,
+const baseCanvasStyle = {
   touchAction: 'none',
   position: 'absolute',
   transform: 'translate(-50%, -50%)',
@@ -46,39 +51,53 @@ export function HuePicker({ onChange, brightness }) {
 
   const [dragging, setDragging] = useState(false);
 
-  function sendEvent(e) {
-    if (!onChange) {
-      return;
-    }
+  const sendEvent = useCallback(
+    e => {
+      if (!onChange) {
+        return;
+      }
 
-    const c = canvasEl.current;
+      const c = canvasEl.current;
 
-    const { x, y } = c.getBoundingClientRect();
+      const { x, y } = c.getBoundingClientRect();
 
-    const ctx = c.getContext('2d');
+      const ctx = c.getContext('2d');
 
-    const [r, g, b, a] = ctx.getImageData(
-      e.clientX - x,
-      e.clientY - y,
-      1,
-      1,
-    ).data;
+      const [r, g, b, a] = ctx.getImageData(
+        e.clientX - x,
+        e.clientY - y,
+        1,
+        1,
+      ).data;
 
-    if (a === 255) {
-      onChange([r, g, b]);
-    }
-  }
+      if (a === 255) {
+        onChange([r, g, b]);
+      }
+    },
+    [onChange],
+  );
 
-  function handlePointerDown(e) {
-    sendEvent(e);
-    setDragging(true);
-  }
-
-  function handlePointerMove(e) {
-    if (onChange && dragging) {
+  const handlePointerDown = useCallback(
+    e => {
       sendEvent(e);
-    }
-  }
+      setDragging(true);
+    },
+    [sendEvent],
+  );
+
+  const handlePointerMove = useCallback(
+    e => {
+      if (onChange && dragging) {
+        sendEvent(e);
+      }
+    },
+    [onChange, dragging, sendEvent],
+  );
+
+  const canvasStyle = useMemo(
+    () => ({ ...baseCanvasStyle, filter: `brightness(${brightness * 100}%)` }),
+    [brightness],
+  );
 
   // TODO use webgl: https://github.com/gre/gl-react-dom-v2/, https://thebookofshaders.com/06/
   return (

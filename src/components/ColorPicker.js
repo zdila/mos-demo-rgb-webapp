@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { HuePicker } from './HuePicker';
 import { BrightnessPicker } from './BrightnessPicker';
 
@@ -7,19 +7,28 @@ export function ColorPicker({ onChange }) {
 
   const [brightness, setBrightness] = useState(1);
 
-  function sendEvent(rgb, v) {
-    onChange(rgb.map(x => x * v));
-  }
+  const sendEvent = useCallback(
+    (rgb, v) => {
+      onChange(rgb.map(x => x * v));
+    },
+    [onChange],
+  );
 
-  function handleHueChange(rgb) {
-    setHue(rgb);
-    sendEvent(rgb, brightness);
-  }
+  const handleHueChange = useCallback(
+    rgb => {
+      setHue(rgb);
+      sendEvent(rgb, brightness);
+    },
+    [sendEvent],
+  );
 
-  function handleBrightnessChange(v) {
-    setBrightness(v);
-    sendEvent(hue, v);
-  }
+  const handleBrightnessChange = useCallback(
+    v => {
+      setBrightness(v);
+      sendEvent(hue, v);
+    },
+    [sendEvent],
+  );
 
   return (
     <>
