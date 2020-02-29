@@ -1,5 +1,14 @@
 import React, { useRef, useState } from 'react';
 
+const brightnessPickerStyle = {
+  flexGrow: 1,
+  minHeight: '40pt',
+  alignSelf: 'stretch',
+  backgroundImage: `linear-gradient(to right, black, ${color})`,
+  touchAction: 'none',
+  margin: '4pt',
+};
+
 export function BrightnessPicker({ onChange, color }) {
   const divEl = useRef(null);
 
@@ -25,14 +34,7 @@ export function BrightnessPicker({ onChange, color }) {
   return (
     <div
       ref={divEl}
-      style={{
-        flexGrow: 1,
-        minHeight: '40pt',
-        alignSelf: 'stretch',
-        backgroundImage: `linear-gradient(to right, black, ${color})`,
-        touchAction: 'none',
-        margin: '4pt',
-      }}
+      style={brightnessPickerStyle}
       onPointerDown={handlePointerDown}
       onPointerUp={() => setDragging(false)}
       onPointerLeave={() => setDragging(false)}

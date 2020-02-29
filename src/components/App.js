@@ -3,6 +3,22 @@ import { useThrottle } from 'use-throttle';
 import mqtt from 'mqtt';
 import { ColorPicker } from './ColorPicker';
 
+const connStateStyle = {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  margin: '4pt',
+  zIndex: 100,
+};
+
+const colorPickerStyle = {
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-around',
+  alignItems: 'center',
+};
+
 export function App() {
   const clientRef = useRef();
 
@@ -68,26 +84,8 @@ export function App() {
 
   return (
     <>
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          margin: '4pt',
-          zIndex: 100,
-        }}
-      >
-        {connState}
-      </div>
-      <div
-        style={{
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-around',
-          alignItems: 'center',
-        }}
-      >
+      <div style={connStateStyle}>{connState}</div>
+      <div style={colorPickerStyle}>
         <ColorPicker onChange={setColor} />
       </div>
     </>

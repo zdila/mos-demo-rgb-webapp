@@ -1,6 +1,22 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { drawCircle } from './colorWheel';
 
+const containerStyle = {
+  flexGrow: 4,
+  alignSelf: 'stretch',
+  margin: '4pt',
+  position: 'relative',
+};
+
+const canvasStyle = {
+  filter: `brightness(${brightness * 100}%)`,
+  touchAction: 'none',
+  position: 'absolute',
+  transform: 'translate(-50%, -50%)',
+  top: '50%',
+  left: '50%',
+};
+
 export function HuePicker({ onChange, brightness }) {
   const canvasEl = useRef(null);
 
@@ -55,7 +71,6 @@ export function HuePicker({ onChange, brightness }) {
 
   function handlePointerDown(e) {
     sendEvent(e);
-
     setDragging(true);
   }
 
@@ -67,24 +82,10 @@ export function HuePicker({ onChange, brightness }) {
 
   // TODO use webgl: https://github.com/gre/gl-react-dom-v2/, https://thebookofshaders.com/06/
   return (
-    <div
-      style={{
-        flexGrow: 4,
-        alignSelf: 'stretch',
-        margin: '4pt',
-        position: 'relative',
-      }}
-    >
+    <div style={containerStyle}>
       <canvas
         ref={canvasEl}
-        style={{
-          filter: `brightness(${brightness * 100}%)`,
-          touchAction: 'none',
-          position: 'absolute',
-          transform: 'translate(-50%, -50%)',
-          top: '50%',
-          left: '50%',
-        }}
+        style={canvasStyle}
         onPointerDown={handlePointerDown}
         onPointerUp={() => setDragging(false)}
         onPointerLeave={() => setDragging(false)}
