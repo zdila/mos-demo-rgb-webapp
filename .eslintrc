@@ -7,7 +7,8 @@
   ],
   "env": {
     "es6": true,
-    "browser": true
+    "browser": true,
+    "node": true
   },
   "parserOptions": {
     "ecmaVersion": 6,
@@ -21,5 +22,10 @@
     // ...
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
   }
 }
