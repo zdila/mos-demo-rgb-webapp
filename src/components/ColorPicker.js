@@ -1,23 +1,46 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useReducer, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { HuePicker } from './HuePicker';
 import { BrightnessPicker } from './BrightnessPicker';
 
-export function ColorPicker({ onChange }) {
-  const [hue, setHue] = useState([255, 255, 255]);
+function reducer(state, action) {
+  switch (action.type) {
+    case 'setHue':
+      return { ...state, modified: true, hue: action.payload };
+    case 'setBrightness':
+      return { ...state, modified: true, brightness: action.payload };
+    default:
+      break;
+  }
+}
 
-  const [brightness, setBrightness] = useState(1);
+export function ColorPicker({ onChange }) {
+  const [state, dispatch] = useReducer(reducer, {
+    hue: [255, 255, 255],
+    brightness: 1,
+    modified: false,
+  });
 
   useEffect(() => {
-    onChange(hue.map(x => x * brightness));
-  }, [hue, brightness, onChange]);
+    if (state.modified) {
+      onChange(state.hue.map(x => x * state.brightness));
+    }
+  }, [state, onChange]);
+
+  const handleBrightnessChange = useCallback(brightness => {
+    dispatch({ type: 'setBrightness', payload: brightness });
+  }, []);
+
+  const handleHueChange = useCallback(hue => {
+    dispatch({ type: 'setHue', payload: hue });
+  }, []);
 
   return (
     <>
-      <HuePicker onChange={setHue} brightness={brightness} />
+      <HuePicker onChange={handleHueChange} brightness={state.brightness} />
       <BrightnessPicker
-        onChange={setBrightness}
-        color={`rgb(${hue[0]}, ${hue[1]}, ${hue[2]})`}
+        onChange={handleBrightnessChange}
+        color={`rgb(${state.hue.join(',')})`}
       />
     </>
   );
