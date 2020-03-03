@@ -36,7 +36,7 @@ export function BrightnessPicker({ onChange, color }) {
         sendEvent(e);
       }
     },
-    [sendEvent],
+    [sendEvent, dragging],
   );
 
   const brightnessPickerStyle = useMemo(
