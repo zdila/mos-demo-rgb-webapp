@@ -5,6 +5,7 @@ import React, {
   useMemo,
   useCallback,
 } from 'react';
+import PropTypes from 'prop-types';
 import { drawCircle } from './colorWheel';
 
 const containerStyle = {
@@ -113,3 +114,8 @@ export function HuePicker({ onChange, brightness }) {
     </div>
   );
 }
+
+HuePicker.propTypes = {
+  brightness: PropTypes.number.isRequired,
+  onChange: PropTypes.func.isRequired,
+};

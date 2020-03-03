@@ -1,4 +1,5 @@
 import React, { useRef, useState, useCallback, useMemo } from 'react';
+import PropTypes from 'prop-types';
 
 const baseBrightnessPickerStyle = {
   flexGrow: 1,
@@ -58,3 +59,8 @@ export function BrightnessPicker({ onChange, color }) {
     />
   );
 }
+
+BrightnessPicker.propTypes = {
+  color: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+};

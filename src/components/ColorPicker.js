@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { HuePicker } from './HuePicker';
 import { BrightnessPicker } from './BrightnessPicker';
 
@@ -21,3 +22,7 @@ export function ColorPicker({ onChange }) {
     </>
   );
 }
+
+ColorPicker.propTypes = {
+  onChange: PropTypes.func.isRequired,
+};
