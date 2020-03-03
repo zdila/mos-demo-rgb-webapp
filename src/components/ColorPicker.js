@@ -19,7 +19,7 @@ export function ColorPicker({ onChange }) {
       setHue(rgb);
       sendEvent(rgb, brightness);
     },
-    [sendEvent],
+    [sendEvent, brightness],
   );
 
   const handleBrightnessChange = useCallback(
@@ -27,7 +27,7 @@ export function ColorPicker({ onChange }) {
       setBrightness(v);
       sendEvent(hue, v);
     },
-    [sendEvent],
+    [sendEvent, hue],
   );
 
   return (
