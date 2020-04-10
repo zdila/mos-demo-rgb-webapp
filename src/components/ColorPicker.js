@@ -1,51 +1,53 @@
-import React, { useEffect, useReducer, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { HuePicker } from './HuePicker';
 import { BrightnessPicker } from './BrightnessPicker';
+import { hsv2rgb } from '../color';
 
-function reducer(state, action) {
-  switch (action.type) {
-    case 'setHue':
-      return { ...state, modified: true, hue: action.payload };
-    case 'setBrightness':
-      return { ...state, modified: true, brightness: action.payload };
-    default:
-      break;
-  }
-}
+export function ColorPicker({
+  onChange,
+  color: { hue, saturation, brightness },
+}) {
+  const handleBrightnessChange = useCallback(
+    brightness => {
+      onChange({ hue, saturation, brightness });
+    },
+    [hue, saturation, onChange],
+  );
 
-export function ColorPicker({ onChange }) {
-  const [state, dispatch] = useReducer(reducer, {
-    hue: [255, 255, 255],
-    brightness: 1,
-    modified: false,
-  });
+  const handleHueChange = useCallback(
+    ({ hue, saturation }) => {
+      onChange({ hue, saturation, brightness });
+    },
+    [brightness, onChange],
+  );
 
-  useEffect(() => {
-    if (state.modified) {
-      onChange(state.hue.map(x => x * state.brightness));
-    }
-  }, [state, onChange]);
-
-  const handleBrightnessChange = useCallback(brightness => {
-    dispatch({ type: 'setBrightness', payload: brightness });
-  }, []);
-
-  const handleHueChange = useCallback(hue => {
-    dispatch({ type: 'setHue', payload: hue });
-  }, []);
+  const rgb = hsv2rgb(hue / 2 / Math.PI, 1, 1);
 
   return (
     <>
-      <HuePicker onChange={handleHueChange} brightness={state.brightness} />
+      <HuePicker
+        onChange={handleHueChange}
+        hue={hue}
+        saturation={saturation}
+        brightness={brightness}
+      />
+
       <BrightnessPicker
         onChange={handleBrightnessChange}
-        color={`rgb(${state.hue.join(',')})`}
+        color={`rgb(${rgb.map(x => x * 255).join(',')})`}
+        brightness={brightness}
       />
     </>
   );
 }
 
 ColorPicker.propTypes = {
+  color: PropTypes.shape({
+    hue: PropTypes.number.isRequired,
+    saturation: PropTypes.number.isRequired,
+    brightness: PropTypes.number.isRequired,
+  }).isRequired,
+
   onChange: PropTypes.func.isRequired,
 };

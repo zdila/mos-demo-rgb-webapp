@@ -1,7 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useCallback, useReducer } from 'react';
 import { useThrottle } from 'use-throttle';
 import mqtt from 'mqtt';
 import { ColorPicker } from './ColorPicker';
+import { hsv2rgb, rgb2hsv } from '../color';
+
+const clientId = Math.random()
+  .toString(36)
+  .slice(2);
 
 const connStateStyle = {
   position: 'absolute',
@@ -19,12 +24,51 @@ const colorPickerStyle = {
   alignItems: 'center',
 };
 
+function reducer(state, { type, payload }) {
+  switch (type) {
+    case 'setColor':
+      return payload.clientId === clientId
+        ? state
+        : {
+            ...state,
+            colors: Object.assign({}, state.colors, {
+              [payload.device || state.device]: payload.color,
+            }),
+          };
+
+    case 'setDevice':
+      return { ...state, device: payload };
+
+    case 'setConnState':
+      return { ...state, connState: payload };
+
+    default:
+      return state;
+  }
+}
+
+const defaultColor = {
+  hue: 0,
+  saturation: 0,
+  brightness: 1,
+};
+
+const connStateMessages = {
+  disconnected: 'Disconnected.',
+  connected: 'Connected.',
+  reconnect: 'Reconnecting…',
+  offline: 'Offline.',
+  closed: 'Closed.',
+};
+
 export function App() {
   const clientRef = useRef();
 
-  const [color, setColor] = useState(undefined);
-
-  const [connState, setConnState] = useState('Disconnected.');
+  const [state, dispatch] = useReducer(reducer, {
+    colors: {},
+    device: 'esp32_B1B449',
+    connState: 'disconnected',
+  });
 
   useEffect(() => {
     const client = mqtt.connect({
@@ -36,25 +80,48 @@ export function App() {
     });
 
     client.on('connect', () => {
-      setConnState('Connected.');
+      dispatch({ type: 'setConnState', payload: 'connected' });
     });
 
     client.on('reconnect', () => {
-      setConnState('Reconnecting...');
+      dispatch({ type: 'setConnState', payload: 'reconnect' });
     });
 
     client.on('close', () => {
-      setConnState('Closed.');
+      dispatch({ type: 'setConnState', payload: 'closed' });
     });
 
     client.on('offline', () => {
-      setConnState('Offline.');
+      dispatch({ type: 'setConnState', payload: 'offline' });
     });
 
     client.on('error', err => {
-      setConnState(`Error: ${err.message}`);
+      dispatch({ type: 'setConnState', payload: `Error: ${err.message}` });
       window.alert(`Error: ${err.message}`);
     });
+
+    client.on('message', (topic, msg) => {
+      try {
+        const rgb = JSON.parse(msg.toString('ascii'));
+
+        const [hue, saturation, brightness] = rgb2hsv(rgb.r, rgb.g, rgb.b);
+
+        dispatch({
+          type: 'setColor',
+          payload: {
+            device: topic.replace(/\/.*/, ''),
+            color: { hue, saturation, brightness },
+            clientId: rgb.clientId,
+          },
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    });
+
+    client.subscribe('esp32_B1B449/rgb');
+
+    client.subscribe('esp32_B04601/rgb');
 
     clientRef.current = client;
 
@@ -64,29 +131,60 @@ export function App() {
   }, []);
 
   // let's throttle events to not to overload mqtt
-  const throttledColor = useThrottle(color, 200);
+  const throttledColor = useThrottle(state.colors[state.device], 100);
+
+  const handleDeviceChange = useCallback(e => {
+    dispatch({ type: 'setDevice', payload: e.target.value });
+  }, []);
 
   useEffect(() => {
     if (throttledColor) {
+      const rgb = hsv2rgb(
+        throttledColor.hue / 2 / Math.PI,
+        throttledColor.saturation,
+        throttledColor.brightness,
+      );
+
       clientRef.current.publish(
-        'esp32_B1B449/rpc',
+        `${state.device}/rgb`,
         JSON.stringify({
-          method: 'setRGB',
-          params: {
-            r: throttledColor[0] / 255,
-            g: throttledColor[1] / 255,
-            b: throttledColor[2] / 255,
-          },
+          r: rgb[0],
+          g: rgb[1],
+          b: rgb[2],
+          clientId,
         }),
+        {
+          retain: true,
+        },
       );
     }
+    // note that device dep is missing not to set color on device change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [throttledColor]);
+
+  const handleColorChange = useCallback(color => {
+    dispatch({ type: 'setColor', payload: { color } });
+  }, []);
 
   return (
     <>
-      <div style={connStateStyle}>{connState}</div>
+      <div style={connStateStyle}>
+        <select
+          style={{ display: 'block', marginBottom: 4 }}
+          onChange={handleDeviceChange}
+          value={state.device}
+          disabled={state.connState !== 'connected'}
+        >
+          <option value="esp32_B1B449">Spálňa</option>
+          <option value="esp32_B04601">Obývačka</option>
+        </select>
+        {connStateMessages[state.connState] || state.connState}
+      </div>
       <div style={colorPickerStyle}>
-        <ColorPicker onChange={setColor} />
+        <ColorPicker
+          onChange={handleColorChange}
+          color={state.colors[state.device] || defaultColor}
+        />
       </div>
     </>
   );

@@ -7,9 +7,11 @@ const baseBrightnessPickerStyle = {
   alignSelf: 'stretch',
   touchAction: 'none',
   margin: '4pt',
+  position: 'relative',
+  overflow: 'hidden',
 };
 
-export function BrightnessPicker({ onChange, color }) {
+export function BrightnessPicker({ onChange, brightness, color }) {
   const divEl = useRef(null);
 
   const [dragging, setDragging] = useState(false);
@@ -18,7 +20,7 @@ export function BrightnessPicker({ onChange, color }) {
     e => {
       const { x, width } = divEl.current.getBoundingClientRect();
 
-      onChange((e.clientX - x) / width);
+      onChange(Math.max(Math.min((e.clientX - x) / width, 1), 0));
     },
     [onChange],
   );
@@ -50,17 +52,30 @@ export function BrightnessPicker({ onChange, color }) {
 
   return (
     <div
-      ref={divEl}
       style={brightnessPickerStyle}
+      ref={divEl}
       onPointerDown={handlePointerDown}
       onPointerUp={() => setDragging(false)}
       onPointerLeave={() => setDragging(false)}
       onPointerMove={handlePointerMove}
-    />
+    >
+      <div
+        style={{
+          position: 'absolute',
+          width: '8px',
+          top: 0,
+          bottom: 0,
+          left: `calc(${brightness * 100}% - 4px)`,
+          backgroundColor: brightness > 0.5 ? 'black' : 'white',
+          opacity: 0.5,
+        }}
+      />
+    </div>
   );
 }
 
 BrightnessPicker.propTypes = {
   color: PropTypes.string.isRequired,
+  brightness: PropTypes.number.isRequired,
   onChange: PropTypes.func.isRequired,
 };

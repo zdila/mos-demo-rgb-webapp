@@ -13,6 +13,7 @@ const containerStyle = {
   alignSelf: 'stretch',
   margin: '4pt',
   position: 'relative',
+  overflow: 'hidden',
 };
 
 const baseCanvasStyle = {
@@ -23,24 +24,25 @@ const baseCanvasStyle = {
   left: '50%',
 };
 
-export function HuePicker({ onChange, brightness }) {
+export function HuePicker({ onChange, hue, saturation, brightness }) {
   const canvasEl = useRef(null);
 
+  const [size, setSize] = useState(100);
+
+  const resizeCanvas = useCallback(() => {
+    const canvas = canvasEl.current;
+
+    const w = canvas.parentNode.clientWidth;
+    const h = canvas.parentNode.clientHeight;
+
+    const size = Math.min(w, h);
+
+    setSize(size);
+
+    drawCircle(canvas);
+  }, []);
+
   useEffect(() => {
-    const resizeCanvas = () => {
-      const canvas = canvasEl.current;
-
-      const w = canvas.parentNode.clientWidth;
-      const h = canvas.parentNode.clientHeight;
-
-      const size = Math.min(w, h);
-
-      canvas.width = size;
-      canvas.height = size;
-
-      drawCircle(canvas);
-    };
-
     resizeCanvas();
 
     window.addEventListener('resize', resizeCanvas);
@@ -48,32 +50,31 @@ export function HuePicker({ onChange, brightness }) {
     return () => {
       window.removeEventListener('resize', resizeCanvas);
     };
-  }, []);
+  }, [resizeCanvas]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      resizeCanvas();
+    });
+  }, [resizeCanvas]);
 
   const [dragging, setDragging] = useState(false);
 
   const sendEvent = useCallback(
     e => {
-      if (!onChange) {
-        return;
-      }
+      const { x, y, width, height } = canvasEl.current.getBoundingClientRect();
 
-      const c = canvasEl.current;
+      const dx = ((width / 2 - (e.clientX - x)) / width) * 2;
 
-      const { x, y } = c.getBoundingClientRect();
+      const dy = ((height / 2 - (e.clientY - y)) / height) * 2;
 
-      const ctx = c.getContext('2d');
+      const ang = Math.atan2(dy, dx);
 
-      const [r, g, b, a] = ctx.getImageData(
-        e.clientX - x,
-        e.clientY - y,
-        1,
-        1,
-      ).data;
+      const hue = ang < 0 ? Math.PI * 2 + ang : ang;
 
-      if (a === 255) {
-        onChange([r, g, b]);
-      }
+      const saturation = Math.sqrt(dx * dx + dy * dy);
+
+      onChange({ hue, saturation: Math.min(saturation, 1) });
     },
     [onChange],
   );
@@ -102,20 +103,37 @@ export function HuePicker({ onChange, brightness }) {
 
   // TODO use webgl: https://github.com/gre/gl-react-dom-v2/, https://thebookofshaders.com/06/
   return (
-    <div style={containerStyle}>
-      <canvas
-        ref={canvasEl}
-        style={canvasStyle}
-        onPointerDown={handlePointerDown}
-        onPointerUp={() => setDragging(false)}
-        onPointerLeave={() => setDragging(false)}
-        onPointerMove={handlePointerMove}
+    <div
+      style={containerStyle}
+      onPointerDown={handlePointerDown}
+      onPointerUp={() => setDragging(false)}
+      // onPointerLeave={() => setDragging(false)}
+      onPointerMove={handlePointerMove}
+    >
+      <canvas ref={canvasEl} style={canvasStyle} width={size} height={size} />
+
+      <div
+        style={{
+          position: 'absolute',
+          left: `calc(50% - 5px - ${(size / 2) *
+            saturation *
+            Math.cos(hue)}px)`,
+          top: `calc(50% - 5px - ${(size / 2) * saturation * Math.sin(hue)}px)`,
+          backgroundColor: brightness > 0.5 ? 'black' : 'white',
+          opacity: 0.5,
+          width: '16px',
+          height: '16px',
+          borderRadius: '8px',
+          pointerEvents: 'none',
+        }}
       />
     </div>
   );
 }
 
 HuePicker.propTypes = {
+  hue: PropTypes.number.isRequired,
+  saturation: PropTypes.number.isRequired,
   brightness: PropTypes.number.isRequired,
   onChange: PropTypes.func.isRequired,
 };
