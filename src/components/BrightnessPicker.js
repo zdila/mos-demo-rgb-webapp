@@ -17,7 +17,7 @@ export function BrightnessPicker({ onChange, brightness, color }) {
   const [dragging, setDragging] = useState(false);
 
   const sendEvent = useCallback(
-    e => {
+    (e) => {
       const { x, width } = divEl.current.getBoundingClientRect();
 
       onChange(Math.max(Math.min((e.clientX - x) / width, 1), 0));
@@ -26,7 +26,7 @@ export function BrightnessPicker({ onChange, brightness, color }) {
   );
 
   const handlePointerDown = useCallback(
-    e => {
+    (e) => {
       setDragging(true);
       sendEvent(e);
     },
@@ -34,7 +34,7 @@ export function BrightnessPicker({ onChange, brightness, color }) {
   );
 
   const handlePointerMove = useCallback(
-    e => {
+    (e) => {
       if (dragging) {
         sendEvent(e);
       }

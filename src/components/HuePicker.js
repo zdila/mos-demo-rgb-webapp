@@ -61,7 +61,7 @@ export function HuePicker({ onChange, hue, saturation, brightness }) {
   const [dragging, setDragging] = useState(false);
 
   const sendEvent = useCallback(
-    e => {
+    (e) => {
       const { x, y, width, height } = canvasEl.current.getBoundingClientRect();
 
       const dx = ((width / 2 - (e.clientX - x)) / width) * 2;
@@ -80,7 +80,7 @@ export function HuePicker({ onChange, hue, saturation, brightness }) {
   );
 
   const handlePointerDown = useCallback(
-    e => {
+    (e) => {
       sendEvent(e);
       setDragging(true);
     },
@@ -88,7 +88,7 @@ export function HuePicker({ onChange, hue, saturation, brightness }) {
   );
 
   const handlePointerMove = useCallback(
-    e => {
+    (e) => {
       if (onChange && dragging) {
         sendEvent(e);
       }
@@ -115,9 +115,9 @@ export function HuePicker({ onChange, hue, saturation, brightness }) {
       <div
         style={{
           position: 'absolute',
-          left: `calc(50% - 5px - ${(size / 2) *
-            saturation *
-            Math.cos(hue)}px)`,
+          left: `calc(50% - 5px - ${
+            (size / 2) * saturation * Math.cos(hue)
+          }px)`,
           top: `calc(50% - 5px - ${(size / 2) * saturation * Math.sin(hue)}px)`,
           backgroundColor: brightness > 0.5 ? 'black' : 'white',
           opacity: 0.5,

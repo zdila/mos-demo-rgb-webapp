@@ -9,7 +9,7 @@ export function ColorPicker({
   color: { hue, saturation, brightness },
 }) {
   const handleBrightnessChange = useCallback(
-    brightness => {
+    (brightness) => {
       onChange({ hue, saturation, brightness });
     },
     [hue, saturation, onChange],
@@ -22,7 +22,7 @@ export function ColorPicker({
     [brightness, onChange],
   );
 
-  const rgb = hsv2rgb(hue / 2 / Math.PI, 1, 1);
+  const rgb = hsv2rgb(hue / 2 / Math.PI, saturation, 1);
 
   return (
     <>
@@ -35,7 +35,7 @@ export function ColorPicker({
 
       <BrightnessPicker
         onChange={handleBrightnessChange}
-        color={`rgb(${rgb.map(x => x * 255).join(',')})`}
+        color={`rgb(${rgb.map((x) => x * 255).join(',')})`}
         brightness={brightness}
       />
     </>

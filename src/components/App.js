@@ -4,9 +4,7 @@ import mqtt from 'mqtt';
 import { ColorPicker } from './ColorPicker';
 import { hsv2rgb, rgb2hsv } from '../color';
 
-const clientId = Math.random()
-  .toString(36)
-  .slice(2);
+const clientId = Math.random().toString(36).slice(2);
 
 const connStateStyle = {
   position: 'absolute',
@@ -34,6 +32,7 @@ function reducer(state, { type, payload }) {
             colors: Object.assign({}, state.colors, {
               [payload.device || state.device]: payload.color,
             }),
+            clientId: payload.clientId,
           };
 
     case 'setDevice':
@@ -95,23 +94,23 @@ export function App() {
       dispatch({ type: 'setConnState', payload: 'offline' });
     });
 
-    client.on('error', err => {
+    client.on('error', (err) => {
       dispatch({ type: 'setConnState', payload: `Error: ${err.message}` });
       window.alert(`Error: ${err.message}`);
     });
 
     client.on('message', (topic, msg) => {
       try {
-        const rgb = JSON.parse(msg.toString('ascii'));
+        const data = JSON.parse(msg.toString('ascii'));
 
-        const [hue, saturation, brightness] = rgb2hsv(rgb.r, rgb.g, rgb.b);
+        const [hue, saturation, brightness] = rgb2hsv(data.r, data.g, data.b);
 
         dispatch({
           type: 'setColor',
           payload: {
             device: topic.replace(/\/.*/, ''),
             color: { hue, saturation, brightness },
-            clientId: rgb.clientId,
+            clientId: data.clientId,
           },
         });
       } catch (err) {
@@ -131,18 +130,20 @@ export function App() {
   }, []);
 
   // let's throttle events to not to overload mqtt
-  const throttledColor = useThrottle(state.colors[state.device], 100);
+  const throttledState = useThrottle(state, 100);
 
-  const handleDeviceChange = useCallback(e => {
+  const handleDeviceChange = useCallback((e) => {
     dispatch({ type: 'setDevice', payload: e.target.value });
   }, []);
 
   useEffect(() => {
-    if (throttledColor) {
+    const color = throttledState.colors[throttledState.device];
+
+    if (color && !throttledState.clientId) {
       const rgb = hsv2rgb(
-        throttledColor.hue / 2 / Math.PI,
-        throttledColor.saturation,
-        throttledColor.brightness,
+        color.hue / 2 / Math.PI,
+        color.saturation,
+        color.brightness,
       );
 
       clientRef.current.publish(
@@ -160,9 +161,9 @@ export function App() {
     }
     // note that device dep is missing not to set color on device change
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [throttledColor]);
+  }, [throttledState]);
 
-  const handleColorChange = useCallback(color => {
+  const handleColorChange = useCallback((color) => {
     dispatch({ type: 'setColor', payload: { color } });
   }, []);
 
